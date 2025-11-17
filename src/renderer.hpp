@@ -3,52 +3,39 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <vector>
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
 
 
 
 class Renderer {
 private:
 
-    float m_vertices[9] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
-    };
+    std::vector<float> m_vertices;
+    std::vector<unsigned int> m_indices;
 
-    const std::string vertexShaderSource =
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main() {\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
-
-    const std::string fragmentShaderSource =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "   FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);\n"
-        "}\0";
+    std::string m_vertexShaderSource;
+    std::string m_fragmentShaderSource;
 
     GLuint m_shaderProgram;
 
+    void readShader(const std::string& filepath);
     GLuint createShader(GLenum type, const std::string& source);
-
     GLuint linkShadersIntoProgram(const std::vector<GLuint>&& shaders);
     
 
 public:
 
-    Renderer() = default;
-
+    Renderer();
     ~Renderer() = default;
 
-    
+    void setVertices(const std::vector<float>& arr) { m_vertices = arr; }
+    void setIndices(const std::vector<unsigned int>& arr) { m_indices = arr; }
 
     void render() const;
-
     void defineGeometry();
 };
 

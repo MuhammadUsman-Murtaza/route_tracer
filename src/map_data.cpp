@@ -15,7 +15,6 @@
 #include <iomanip>
 #include <sstream>
 
-// Structure to hold merged road info
 struct Road {
     std::string name;
     std::string type;
@@ -25,7 +24,6 @@ struct Road {
 class MyHandler : public osmium::handler::Handler {
 public:
     std::map<std::pair<std::string, std::string>, Road> mergedRoads;
-    // store node coordinates so we can print lat/lon for nodes referenced in ways
     std::unordered_map<osmium::object_id_type, std::pair<double, double>> node_coords;
 
     void node(const osmium::Node& node) {
@@ -76,7 +74,6 @@ public:
                         << " ... " << seg.back()
                         << " (" << seg.size() << " nodes)\n";
 
-                    // print lat/lon for first and last node if available
                     auto print_coord = [&](osmium::object_id_type nid) {
                         auto it = node_coords.find(nid);
                         if (it != node_coords.end()) {
@@ -117,7 +114,7 @@ public:
 };
 
 void parseMap() {
-    const std::string input_file = "./data/karachi.osm.pbf";
+    const std::string input_file = "res/data/karachi.osm.pbf";
 
     try {
         osmium::io::Reader reader(input_file);
@@ -130,7 +127,7 @@ void parseMap() {
         auto now = std::chrono::system_clock::now();
         std::time_t t = std::chrono::system_clock::to_time_t(now);
         std::stringstream filename;
-        filename << "./data/output_"
+        filename << "res/data/output_"
                  << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S")
                  << ".txt";
 

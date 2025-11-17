@@ -214,7 +214,7 @@ std::vector<int64_t> astar(int64_t start, int64_t goal) {
 }
 
 void aStar() {
-    const std::string map_file = "/home/kali/source/repos/route_tracer/data/karachi.osm.pbf";
+    const std::string map_file = "res/data/karachi.osm.pbf";
     loadKarachiMap(map_file);
 
     std::cout << "Do you want to enter (1) node IDs or (2) coordinates? Enter 1 or 2: ";
@@ -257,7 +257,7 @@ void aStar() {
     auto now = std::chrono::system_clock::now();
     std::time_t t = std::chrono::system_clock::to_time_t(now);
     std::stringstream filename;
-    filename << "/home/kali/source/repos/route_tracer/data/path_output_"
+    filename << "res/data/path_output_"
              << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S") << ".txt";
 
     std::ofstream outfile(filename.str());

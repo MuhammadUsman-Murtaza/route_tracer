@@ -9,8 +9,6 @@ set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/libs/imgui)
 
 file(GLOB SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Add executable
 add_executable(route_tracer
@@ -36,7 +34,7 @@ find_package(BZip2 REQUIRED)
 find_package(EXPAT REQUIRED)
 
 # Include directories
-target_include_directories(route_tracer PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     libs/libosmium/include
@@ -45,7 +43,7 @@ target_include_directories(route_tracer PRIVATE
 )
 
 # Link libraries
-target_link_libraries(route_tracer PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     OpenGL::GL
     X11::X11
@@ -53,3 +51,12 @@ target_link_libraries(route_tracer PRIVATE
     BZip2::BZip2
     EXPAT::EXPAT
 )
+
+add_custom_target(copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/res
+        ${CMAKE_CURRENT_BINARY_DIR}/res
+    COMMENT "Copying resource files"
+)
+
+add_dependencies(${PROJECT_NAME} copy_resources)
