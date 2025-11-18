@@ -1,5 +1,43 @@
-#include "windower.hpp"
+#include <iostream>
 #include <cmath>
+
+#include "imgui_panel.hpp"
+#include "windower.hpp"
+
+
+// Modern Dark Theme Function
+// --------------------------
+void ApplyModernDarkTheme() {
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.WindowRounding = 8.0f;
+    style.FrameRounding = 6.0f;
+    style.PopupRounding = 6.0f;
+    style.ScrollbarRounding = 9.0f;
+    style.GrabRounding = 6.0f;
+
+    style.FrameBorderSize = 1.0f;
+    style.WindowBorderSize = 1.0f;
+
+    style.ItemSpacing = ImVec2(10, 10);
+    style.WindowPadding = ImVec2(12, 12);
+
+    ImVec4* colors = style.Colors;
+
+    colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.14f, 1.0f);
+    colors[ImGuiCol_Header] = ImVec4(0.25f, 0.25f, 0.35f, 1.0f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.35f, 0.35f, 0.45f, 1.0f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.45f, 0.45f, 0.55f, 1.0f);
+
+    colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.30f, 1.0f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.30f, 0.30f, 0.40f, 1.0f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.40f, 0.40f, 0.50f, 1.0f);
+
+    colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.16f, 0.20f, 1.0f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.24f, 0.28f, 1.0f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.28f, 0.28f, 0.32f, 1.0f);
+}
+
 
 Windower::Windower(Renderer& renderer, int windowWidth, int windowHeight)
     : m_renderer(renderer), m_windowWidth(windowWidth), m_windowHeight(windowHeight)
@@ -37,6 +75,7 @@ Windower::Windower(Renderer& renderer, int windowWidth, int windowHeight)
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ApplyModernDarkTheme();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;     
@@ -63,7 +102,10 @@ void Windower::run() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+
+
+        ShowRouteTracerPanel(*this);
+
 
         m_renderer.render();
 
