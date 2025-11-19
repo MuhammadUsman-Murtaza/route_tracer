@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 
+
 Renderer::Renderer() {
     readShader("res/shaders/basic.shader");
 }
@@ -20,7 +21,8 @@ void Renderer::render() const
     } else {
         glDrawElements(m_drawMode, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, 0);
     }
-}
+
+ }
 
 void Renderer::defineGeometry() 
 {

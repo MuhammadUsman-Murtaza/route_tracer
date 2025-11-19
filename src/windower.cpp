@@ -3,6 +3,7 @@
 
 #include "imgui_panel.hpp"
 #include "windower.hpp"
+#include "a_star.hpp"
 
 
 // Modern Dark Theme Function
@@ -94,6 +95,27 @@ Windower::Windower(Renderer& renderer, int windowWidth, int windowHeight)
     m_renderer.setCamera(m_camOX, m_camOY, m_camScale);
 }
 
+//void Windower::run() {
+//     while (!glfwWindowShouldClose(m_window)) {
+//         glfwPollEvents();
+//         processInput();        
+
+//         ImGui_ImplOpenGL3_NewFrame();
+//         ImGui_ImplGlfw_NewFrame();
+//         ImGui::NewFrame();
+
+
+//         ShowRouteTracerPanel(*this);
+
+
+//         m_renderer.render();
+
+//         ImGui::Render();
+//         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        
+//         glfwSwapBuffers(m_window);
+//     }
+// }
 void Windower::run() {
     while (!glfwWindowShouldClose(m_window)) {
         glfwPollEvents();
@@ -103,8 +125,13 @@ void Windower::run() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+    ShowRouteTracerPanel(*this);
+ if (m_runAStarWithNodes || m_runAStarWithCoords) {
+    aStar(*this);  // Pass the current Windower instance
+    m_runAStarWithNodes = false;
+    m_runAStarWithCoords = false;
+}
 
-        ShowRouteTracerPanel(*this);
 
 
         m_renderer.render();

@@ -19,19 +19,25 @@ private:
     int m_windowHeight;
 
 public:
+    // Temporary input buffers
+    char m_startNodeBuffer[32] = "0";
+    char m_endNodeBuffer[32] = "0";
+
+    std::vector<int64_t> m_finalPath;
     // ImGui INPUT VARIABLES (NEW)
     // ------------------------------
 
     // Mode 1: Node ID input
-    int m_startNode = 0;
-    int m_endNode = 0;
+    int64_t m_startNode = 0;
+    int64_t m_endNode = 0;
+
     bool m_runAStarWithNodes = false;
 
     // Mode 2: Coordinate input
-    float m_startLat = 24.8600f;
-    float m_startLon = 67.0100f;
-    float m_endLat   = 24.8700f;
-    float m_endLon   = 67.0200f;
+    double m_startLat = 24.8600f;
+    double m_startLon = 67.0100f;
+    double m_endLat   = 24.8700f;
+    double m_endLon   = 67.0200f;
     bool m_runAStarWithCoords = false;
 
     // Visual Settings

@@ -16,6 +16,14 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include "a_star.hpp"  // your existing a_star header
+#include "windower.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <chrono>
+#include <vector>
 
 struct Node {
     double lat, lon;
@@ -213,7 +221,102 @@ std::vector<int64_t> astar(int64_t start, int64_t goal) {
     return {};
 }
 
+void aStar(Windower& win) {
+    const std::string map_file = "res/data/karachi.osm.pbf";
+    loadKarachiMap(map_file);
+
+    int64_t start = 0, goal = 0;
+
+    // Decide mode from GUI flags
+    if (win.m_runAStarWithNodes) {
+        start = win.m_startNode;
+        goal  = win.m_endNode;
+    } else if (win.m_runAStarWithCoords) {
+        start = findNearestNode(win.m_startLat, win.m_startLon);
+        goal  = findNearestNode(win.m_endLat,   win.m_endLon);
+
+        std::cout << "Nearest start node: " << start
+                  << "  (lat: " << nodes[start].lat << " lon: " << nodes[start].lon << ")\n";
+        std::cout << "Nearest goal node: " << goal
+                  << "  (lat: " << nodes[goal].lat << " lon: " << nodes[goal].lon << ")\n";
+    } else {
+        std::cerr << "No mode selected in GUI!\n";
+        return;
+    }
+
+    if (!nodes.count(start) || !nodes.count(goal)) {
+        std::cerr << "Invalid start or goal node.\n";
+        return;
+    }
+
+    // Output file setup
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream filename;
+    filename << "res/data/path_output_"
+             << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S") << ".txt";
+
+    std::ofstream outfile(filename.str());
+    if (!outfile) {
+        std::cerr << "Failed to create output file.\n";
+        return;
+    }
+
+    double straight_distance = haversine(nodes[start].lat, nodes[start].lon,
+                                         nodes[goal].lat, nodes[goal].lon);
+    std::cout << "Straight-line distance: " << straight_distance / 1000.0 << " km\n";
+
+    std::cout << "Calculating shortest path...\n";
+    auto start_time = std::chrono::high_resolution_clock::now();
+    std::vector<int64_t> path = astar(start, goal);  // use pure algorithm
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
+    // Write info to file
+    outfile << "Start Node ID: " << start << "\n";
+    outfile << "Goal Node ID: " << goal << "\n";
+    outfile << "Straight-line distance: " << straight_distance / 1000.0 << " km\n";
+    outfile << "Calculation time: " << duration.count() << " ms\n";
+    outfile << "------------------------------------\n";
+
+    if (path.empty()) {
+        outfile << "No path found between given nodes.\n";
+        std::cout << "No path found between given nodes.\n";
+    } else {
+        double total = 0;
+        outfile << "Shortest path:\n";
+        for (size_t i = 0; i < path.size(); ++i) {
+            outfile << path[i];
+            if (i + 1 < path.size()) {
+                double d = haversine(nodes[path[i]].lat, nodes[path[i]].lon,
+                                     nodes[path[i + 1]].lat, nodes[path[i + 1]].lon);
+                total += d;
+                outfile << " -> ";
+            }
+        }
+        outfile << "\nTotal distance: " << total / 1000.0 << " km\n";
+        outfile << "Path length: " << path.size() << " nodes\n";
+        outfile << "Efficiency ratio: " << (straight_distance > 0 ? (total / straight_distance) : 0.0) << " (ideal: ~1.0)\n";
+
+        std::cout << "Path saved successfully to: " << filename.str() << "\n";
+        std::cout << "Total distance: " << total / 1000.0 << " km\n";
+        std::cout << "Efficiency ratio: " << (straight_distance > 0 ? (total / straight_distance) : 0.0) << " (ideal: ~1.0)\n";
+
+        if (total / straight_distance > 1.3) {
+            std::cout << "WARNING: Path is significantly longer than straight-line distance!\n";
+            std::cout << "This may indicate missing direct road connections or a routing restriction in the OSM data.\n";
+        }
+    }
+
+    outfile.close();
+
+    // Reset GUI flags
+    win.m_runAStarWithNodes = false;
+    win.m_runAStarWithCoords = false;
+}
+
 void aStar() {
+
     const std::string map_file = "res/data/karachi.osm.pbf";
     loadKarachiMap(map_file);
 
